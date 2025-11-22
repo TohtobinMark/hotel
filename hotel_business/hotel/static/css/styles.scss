@@ -1,0 +1,25 @@
+.services-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+.service-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    }
+.service-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    }
+.service-price {
+    color: #2c5aa0;
+    font-weight: bold;
+    font-size: 1.1em;
+    }
+.service-description {
+    margin-top: 10px;
+    color: #666;
+    }
