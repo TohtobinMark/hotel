@@ -1,10 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Вход | Отель</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.24.2/dist/css/uikit.min.css" />
 </head>
-<body>
-$END$
+<body class="uk-background-muted">
+    <div class="uk-height-viewport uk-flex uk-flex-middle uk-flex-center">
+        <div class="uk-width-large uk-card uk-card-default uk-card-body">
+            <div class="uk-text-center uk-margin-medium-bottom">
+                <h2 class="uk-card-title uk-margin-remove">Авторизация</h2>
+            </div>
+            {% if messages %}
+            <div class="uk-margin-bottom">
+                {% for message in messages %}
+                <div class="uk-alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="email">Почта</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <input class="uk-input"
+                                   type="email"
+                                   name="email"
+                                   id="email"
+                                   placeholder="Введите почту"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="password">Пароль</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <input class="uk-input"
+                                   type="password"
+                                   name="password"
+                                   id="password"
+                                   placeholder="Введите пароль"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <button type="submit" class="uk-button uk-button-primary uk-width-1-1">
+                        Войти
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.24.2/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.24.2/dist/js/uikit-icons.min.js"></script>
 </html>

@@ -1,10 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Register - Hotel Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/css/uikit.min.css" />
 </head>
-<body>
-$END$
+<body class="uk-background-muted">
+    <div class="uk-height-viewport uk-flex uk-flex-middle uk-flex-center">
+        <div class="uk-width-large uk-card uk-card-default uk-card-body uk-box-shadow-large">
+            <div class="uk-text-center uk-margin-medium-bottom">
+                <span class="uk-icon-button uk-button-primary uk-margin-small-bottom" uk-icon="icon: user; ratio: 1.5"></span>
+                <h2 class="uk-card-title uk-margin-remove">Create Account</h2>
+                <p class="uk-text-muted">Join our hotel community</p>
+            </div>
+
+            {% if messages %}
+            <div class="uk-margin-bottom">
+                {% for message in messages %}
+                <div class="uk-alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="full_name">Full Name</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: user"></span>
+                            <input class="uk-input"
+                                   type="text"
+                                   name="full_name"
+                                   id="full_name"
+                                   placeholder="Enter your full name"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="email">Email</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                            <input class="uk-input"
+                                   type="email"
+                                   name="email"
+                                   id="email"
+                                   placeholder="Enter your email"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="phone_number">Phone Number</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: phone"></span>
+                            <input class="uk-input"
+                                   type="tel"
+                                   name="phone_number"
+                                   id="phone_number"
+                                   placeholder="Enter your phone number">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="password">Password</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                            <input class="uk-input"
+                                   type="password"
+                                   name="password"
+                                   id="password"
+                                   placeholder="Enter your password"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <label class="uk-form-label" for="confirm_password">Confirm Password</label>
+                    <div class="uk-form-controls">
+                        <div class="uk-inline uk-width-1-1">
+                            <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                            <input class="uk-input"
+                                   type="password"
+                                   name="confirm_password"
+                                   id="confirm_password"
+                                   placeholder="Confirm your password"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <button type="submit" class="uk-button uk-button-primary uk-width-1-1">
+                        <span uk-icon="icon: plus"></span>
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="uk-margin-medium-top uk-text-center">
+                <p class="uk-text-muted uk-margin-remove">Already have an account?</p>
+                <a href="{% url 'login' %}" class="uk-button uk-button-default uk-button-small">
+                    <span uk-icon="icon: sign-in"></span>
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.16.26/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>

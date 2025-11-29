@@ -1,10 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Сервис отеля</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.24.2/dist/css/uikit.min.css" />
 </head>
 <body>
-$END$
+    <div class="uk-container uk-container-expand uk-margin-top">
+        <div class="uk-text-center uk-margin-large-bottom">
+            <h1 class="uk-heading-primary">Сервис отеля</h1>
+        </div>
+
+        <div class="uk-grid-match uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l" uk-grid>
+            {% for service in services %}
+            <div>
+                <div class="uk-card uk-card-default uk-card-hover uk-card-body uk-height-medium">
+                    <div class="uk-card-badge uk-label uk-label-success">${{ service.price }}</div>
+
+                    <h3 class="uk-card-title uk-text-bold uk-margin-small-bottom">{{ service.name }}</h3>
+
+                    {% if service.description %}
+                    <p class="uk-text-muted uk-margin-remove-top">
+                        {{ service.description }}
+                    </p>
+                    {% else %}
+                    <p class="uk-text-muted uk-text-italic">
+                        Описание не доступно
+                    </p>
+                    {% endif %}
+
+                    <div class="uk-position-bottom uk-padding uk-padding-remove-horizontal">
+                        <div class="uk-grid-small uk-flex-middle" uk-grid>
+                            <div class="uk-width-auto">
+                                <span class="uk-icon-button uk-button-primary" uk-icon="icon: check"></span>
+                            </div>
+                            <div class="uk-width-expand">
+                                <span class="uk-text-small uk-text-muted">Доступно</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="uk-width-1-1">
+                <div class="uk-card uk-card-default uk-card-body uk-text-center">
+                    <div class="uk-margin">
+                        <span class="uk-icon uk-margin-small-right" uk-icon="icon: warning; ratio: 2"></span>
+                    </div>
+                    <h3 class="uk-card-title">Нет доступных сервисов</h3>
+                    <button class="uk-button uk-button-primary" onclick="location.reload()">
+                        <span uk-icon="icon: refresh"></span>
+                        Снова
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Login/Register CTA for guest users -->
+        {% if not user.is_authenticated or user.role == 'guest' %}
+        <div class="uk-section uk-section-muted uk-margin-large-top uk-border-rounded">
+            <div class="uk-container">
+                <div class="uk-grid-large uk-flex-middle" uk-grid>
+                    <div class="uk-width-expand">
+                        <h2 class="uk-text-muted uk-margin-remove-top">Создайте аккаунт или зарегистрируйтесь</h2>
+                    </div>
+                    <div class="uk-width-auto">
+                        <div class="uk-grid-small" uk-grid>
+                            <div>
+                                <a href="{% url 'login' %}" class="uk-button uk-button-primary">
+                                    Войти
+                                </a>
+                            </div>
+                            <div>
+                                <button class="uk-button uk-button-default">
+                                    Регистрация
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.24.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.24.2/dist/js/uikit-icons.min.js"></script>
 </body>
 </html>

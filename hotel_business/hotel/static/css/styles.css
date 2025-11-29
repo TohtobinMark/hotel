@@ -1,0 +1,12 @@
+button.uk-button.uk-button-primary:hover {
+  background-color: #508f63;
+  color: black;
+}
+
+button.uk-button.uk-button-primary {
+  background-color: #67BA80;
+  color: black;
+  text-transform: capitalize;
+}
+
+/*# sourceMappingURL=styles.css.map */

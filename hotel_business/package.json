@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "uikit": "^3.24.2"
+  },
+  "scripts": {
+    "compile-sass": "sass hotel/static/css/styles.scss hotel/static/css/styles.css"
+  },
+  "devDependencies": {
+    "sass": "^1.94.2"
+  }
+}

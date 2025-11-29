@@ -1,3 +1,110 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Service, User, UserRole
 
-# Create your views here.
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Валидация
+        errors = []
+        if not email:
+            errors.append('Email is required')
+        if not password:
+            errors.append('Password is required')
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.email}!')
+
+                # Redirect based on user role
+                if user.role == UserRole.ADMIN:
+                    return redirect('admin_dashboard')
+                elif user.role == UserRole.MANAGER:
+                    return redirect('manager_dashboard')
+                elif user.role == UserRole.CLIENT:
+                    return redirect('client_dashboard')
+                else:
+                    return redirect('services_list')
+            else:
+                messages.error(request, 'Invalid email or password.')
+
+    return render(request, 'auth/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('login')
+
+
+def services_list(request):
+    services = Service.objects.all()
+    return render(request, 'services/list.html', {
+        'services': services,
+        'user': request.user
+    })
+
+
+
+@login_required
+def manager(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+    return render(request, 'users/manager.html')
+
+
+@login_required
+def client(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.CLIENT]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+    return render(request, 'users/client.html')
+
+
+def register_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        full_name = request.POST.get('full_name')
+        phone_number = request.POST.get('phone_number')
+
+        errors = []
+        if not email:
+            errors.append('Email is required')
+        if not password:
+            errors.append('Password is required')
+        if password != confirm_password:
+            errors.append('Passwords do not match')
+        if User.objects.filter(email=email).exists():
+            errors.append('User with this email already exists')
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            try:
+                user = User.objects.create_user(
+                    email=email,
+                    password=password,
+                    first_name=full_name,
+                    phone_number=phone_number,
+                    role=UserRole.CLIENT
+                )
+                messages.success(request, 'Account created successfully! Please login.')
+                return redirect('login')
+            except Exception as e:
+                messages.error(request, f'Error creating account: {str(e)}')
+
+    return render(request, 'auth/register.html')

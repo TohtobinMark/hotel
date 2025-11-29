@@ -1,5 +1,7 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser
+from .managers import CustomUserManager
+from django.utils.translation import gettext_lazy as _
 
 class Document(models.Model):
     series = models.CharField(max_length=50)
@@ -50,3 +52,20 @@ class Item(models.Model):
 class Equipment(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="equipment")
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="equipment")
+
+class UserRole(models.TextChoices):
+    GUEST = 'guest'
+    CLIENT = 'client'
+    MANAGER = 'manager'
+    ADMIN = 'admin'
+
+class User(AbstractUser):
+    username = None
+    email = models.EmailField(_('email'), unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    role = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.GUEST)
+    phone_number = models.CharField(max_length=20, blank=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = CustomUserManager()
