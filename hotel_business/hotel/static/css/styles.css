@@ -9,4 +9,26 @@ button.uk-button.uk-button-primary {
   text-transform: capitalize;
 }
 
+a.uk-button.uk-button-default {
+  text-transform: none;
+}
+
+span.uk-icon {
+  background-color: #67BA80;
+}
+
+div.uk-card-badge {
+  background-color: #67BA80;
+}
+
+label {
+  font-family: Arial;
+}
+
+a.uk-button.uk-button-primary {
+  background-color: #67BA80;
+  color: black;
+  text-transform: capitalize;
+}
+
 /*# sourceMappingURL=styles.css.map */

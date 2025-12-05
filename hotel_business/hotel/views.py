@@ -28,11 +28,11 @@ def login_view(request):
 
                 # Redirect based on user role
                 if user.role == UserRole.ADMIN:
-                    return redirect('admin_dashboard')
+                    return redirect('admin')
                 elif user.role == UserRole.MANAGER:
-                    return redirect('manager_dashboard')
+                    return redirect('manager')
                 elif user.role == UserRole.CLIENT:
-                    return redirect('client_dashboard')
+                    return redirect('services_lists')
                 else:
                     return redirect('services_list')
             else:
