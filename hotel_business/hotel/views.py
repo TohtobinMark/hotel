@@ -189,7 +189,7 @@ def add_service(request):
     if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
         messages.error(request, 'Access denied.')
         return redirect('services_list')
-#d
+#ddd
     if request.method == 'POST':
         try:
             guest_id = request.POST.get('guest_id')
