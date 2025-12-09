@@ -9,16 +9,21 @@ button.uk-button.uk-button-primary {
   text-transform: capitalize;
 }
 
-a.uk-button.uk-button-default {
-  text-transform: none;
+a.uk-button {
+  text-transform: capitalize;
 }
 
-span.uk-icon {
+a.uk-button.uk-button-default {
+  text-transform: capitalize;
+}
+
+span.uk-icon-button {
   background-color: #67BA80;
 }
 
 div.uk-card-badge {
   background-color: #67BA80;
+  text-transform: capitalize;
 }
 
 label {
@@ -29,6 +34,16 @@ a.uk-button.uk-button-primary {
   background-color: #67BA80;
   color: black;
   text-transform: capitalize;
+}
+
+div.uk-card-manager {
+  background-color: #67BA80;
+  color: white;
+  text-transform: capitalize;
+}
+
+.uk-card-title {
+  color: white;
 }
 
 /*# sourceMappingURL=styles.css.map */

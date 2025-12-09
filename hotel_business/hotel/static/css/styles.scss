@@ -3,8 +3,11 @@ $mainDark: #508f63;
 $extraColor: #F4E8D3;
 button.uk-button.uk-button-primary:hover { background-color: $mainDark; color: black; }
 button.uk-button.uk-button-primary { background-color: $mainColor; color: black; text-transform: capitalize;}
-a.uk-button.uk-button-default { text-transform: none; }
-span.uk-icon { background-color: $mainColor; }
-div.uk-card-badge { background-color: $mainColor; }
+a.uk-button { text-transform: capitalize;}
+a.uk-button.uk-button-default { text-transform: capitalize; }
+span.uk-icon-button { background-color: $mainColor; }
+div.uk-card-badge { background-color: $mainColor; text-transform: capitalize;}
 label { font-family: Arial }
 a.uk-button.uk-button-primary { background-color: $mainColor; color: black; text-transform: capitalize;}
+div.uk-card-manager { background-color: $mainColor; color: white; text-transform: capitalize;}
+.uk-card-title {color: white}

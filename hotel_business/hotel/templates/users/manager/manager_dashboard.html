@@ -1,0 +1,43 @@
+{% extends 'users/manager/manager.html' %}
+
+{% block manager_content %}
+<h1 class="uk-heading-divider">Панель управления менеджера</h1>
+
+<div class="uk-grid uk-child-width-1-4@m uk-child-width-1-2@s" uk-grid>
+    <div>
+        <div class="uk-card uk-card-manager uk-card-body">
+            <h3 class="uk-card-title">{{ total_clients }}</h3>
+            <p>Клиентов</p>
+        </div>
+    </div>
+    <div>
+        <div class="uk-card uk-card-manager uk-card-body">
+            <h3 class="uk-card-title">{{ total_services }}</h3>
+            <p>Услуг</p>
+        </div>
+    </div>
+    <div>
+        <div class="uk-card uk-card-manager uk-card-body">
+            <h3 class="uk-card-title">{{ total_rooms }}</h3>
+            <p>Номеров</p>
+        </div>
+    </div>
+    <div>
+        <div class="uk-card uk-card-manager uk-card-body">
+            <h3 class="uk-card-title">{{ active_bookings }}</h3>
+            <p>Активных броней</p>
+        </div>
+    </div>
+</div>
+
+<div class="uk-grid uk-margin-top" uk-grid>
+    <div class="uk-width-1-2">
+        <div class="uk-card uk-card-default uk-card-body">
+            <h3 class="uk-card-title">Быстрое действие</h3>
+            <ul class="uk-list uk-list-divider">
+                <li><a href="{% url 'manager_clients' %}" class="uk-button uk-button-text">Просмотр клиентов</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

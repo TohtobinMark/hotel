@@ -11,5 +11,7 @@ urlpatterns = [
     path('services/', views.services_list, name='services_list'),
     path('admin/', admin.site.urls),
     path('users/manager/', views.manager, name='manager'),
-    path('users/client/', views.client, name='client')
+    path('users/client/', views.client, name='client'),
+    path('manager/', views.manager_dashboard, name='manager'),
+    path('manager/clients/', views.manager_clients, name='manager_clients'),
 ]

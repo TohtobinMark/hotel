@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
+from django.utils import timezone
+from django.db.models import Q
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Service, User, UserRole
+from .models import Service, User, UserRole, Booking, Guest, Category, Room, ServiceProvision
 
 
 def login_view(request):
@@ -32,7 +34,7 @@ def login_view(request):
                 elif user.role == UserRole.MANAGER:
                     return redirect('manager')
                 elif user.role == UserRole.CLIENT:
-                    return redirect('services_lists')
+                    return redirect('services_list')
                 else:
                     return redirect('services_list')
             else:
@@ -61,8 +63,8 @@ def manager(request):
     if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
         messages.error(request, 'Access denied.')
         return redirect('services_list')
-    return render(request, 'users/manager.html')
-
+    clients = User.objects.filter(role='client')
+    return render(request, 'users/manager/manager.html', {'clients': clients})
 
 @login_required
 def client(request):
@@ -108,3 +110,33 @@ def register_view(request):
                 messages.error(request, f'Error creating account: {str(e)}')
 
     return render(request, 'auth/register.html')
+
+@login_required
+def manager_dashboard(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+
+    total_clients = User.objects.filter(role=UserRole.CLIENT).count()
+    total_services = Service.objects.count()
+    total_rooms = Room.objects.count()
+    active_bookings = Booking.objects.filter(
+        check_in_date__lte=timezone.now().date(),
+        check_out_date__gte=timezone.now().date()
+    ).count()
+
+    return render(request, 'users/manager/manager_dashboard.html', {
+        'total_clients': total_clients,
+        'total_services': total_services,
+        'total_rooms': total_rooms,
+        'active_bookings': active_bookings
+    })
+
+@login_required
+def manager_clients(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+
+    clients = User.objects.filter(role=UserRole.CLIENT)
+    return render(request, 'users/manager/manager_clients.html', {'clients': clients})

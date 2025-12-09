@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from .managers import CustomUserManager
