@@ -1,0 +1,55 @@
+{% extends 'users/manager/manager.html' %}
+
+{% block manager_content %}
+<h1 class="uk-heading-divider">Запись клиента на услугу</h1>
+
+<div class="uk-grid" uk-grid>
+    <div class="uk-width-1-1">
+        <form method="post" class="uk-form-stacked">
+            {% csrf_token %}
+            
+            <div class="uk-margin">
+                <label class="uk-form-label">Выберите клиента:</label>
+                <div class="uk-form-controls">
+                    <select class="uk-select" name="guest_id" required>
+                        <option value="">-- Выберите клиента --</option>
+                        {% for guest in guests %}
+                        <option value="{{ guest.id }}">{{ guest.full_name }} ({{ guest.phone_number }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Выберите услугу:</label>
+                <div class="uk-form-controls">
+                    <select class="uk-select" name="service_id" required>
+                        <option value="">-- Выберите услугу --</option>
+                        {% for service in services %}
+                        <option value="{{ service.id }}">{{ service.name }} - {{ service.cost }} руб.</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Дата предоставления услуги:</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="date" name="service_date" required>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Количество:</label>
+                <div class="uk-form-controls">
+                    <input class="uk-input" type="number" name="quantity" value="1" min="1" required>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <button type="submit" class="uk-button uk-button-primary">Записать на услугу</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

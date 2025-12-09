@@ -140,3 +140,106 @@ def manager_clients(request):
 
     clients = User.objects.filter(role=UserRole.CLIENT)
     return render(request, 'users/manager/manager_clients.html', {'clients': clients})
+
+@login_required
+def manager_services(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+    search_query = request.GET.get('search', '')
+    services = Service.objects.all()
+    if search_query:
+        services = services.filter(name__icontains=search_query)
+
+    return render(request, 'users/manager/manager_services.html', {
+        'services': services,
+        'search_query': search_query
+    })
+
+@login_required
+def manager_rooms(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+
+    rooms = Room.objects.select_related('category').prefetch_related('category__equipment__item')
+    categories = Category.objects.all()
+
+    bed_filter = request.GET.get('bed_count', '')
+    category_filter = request.GET.get('category', '')
+
+    if bed_filter:
+        if bed_filter == '4':
+            rooms = rooms.filter(bed_count__gte=4)
+        else:
+            rooms = rooms.filter(bed_count=bed_filter)
+
+    if category_filter:
+        rooms = rooms.filter(category_id=category_filter)
+
+    return render(request, 'users/manager/manager_rooms.html', {
+        'rooms': rooms,
+        'categories': categories,
+        'bed_filter': bed_filter,
+        'category_filter': category_filter
+    })
+
+@login_required
+def add_service(request):
+    if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+        messages.error(request, 'Access denied.')
+        return redirect('services_list')
+
+    if request.method == 'POST':
+        try:
+            guest_id = request.POST.get('guest_id')
+            service_id = request.POST.get('service_id')
+            service_date = request.POST.get('service_date')
+            quantity = int(request.POST.get('quantity', 1))
+
+            # Получаем объекты
+            guest = get_object_or_404(Guest, id=guest_id)
+            service = get_object_or_404(Service, id=service_id)
+
+            # Находим активное бронирование гостя
+            today = timezone.now().date()
+            booking = Booking.objects.filter(
+                guest=guest,
+                check_in_date__lte=today,
+                check_out_date__gte=today
+            ).first()
+
+            if not booking:
+                messages.error(request, 'У гостя нет активного бронирования')
+                return redirect('assign_service')
+
+            existing_provision = ServiceProvision.objects.filter(
+                booking=booking,
+                service=service,
+                service_date=service_date
+            ).first()
+
+            if existing_provision:
+                existing_provision.quantity += quantity
+                existing_provision.save()
+                messages.success(request, f'Количество услуги "{service.name}" обновлено для гостя {guest.full_name}')
+            else:
+                service_provision = ServiceProvision.objects.create(
+                    booking=booking,
+                    service=service,
+                    quantity=quantity,
+                    service_date=service_date
+                )
+                messages.success(request, f'Услуга "{service.name}" успешно назначена гостю {guest.full_name}')
+                return redirect('assign_service')
+
+        except Exception as e:
+            messages.error(request, f'Ошибка: {str(e)}')
+
+    guests = Guest.objects.all()
+    services = Service.objects.all()
+
+    return render(request, 'users/manager/add_service.html', {
+        'guests': guests,
+        'services': services
+    })

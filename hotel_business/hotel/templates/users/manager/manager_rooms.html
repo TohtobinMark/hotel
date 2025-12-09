@@ -1,0 +1,71 @@
+{% extends 'users/manager/manager.html' %}
+
+{% block manager_content %}
+<h1 class="uk-heading-divider">Номерной фонд</h1>
+<div class="uk-card uk-card-default uk-card-body uk-margin-bottom">
+    <h3>Фильтры</h3>
+    <form method="get" class="uk-grid-small" uk-grid>
+        <div class="uk-width-1-4@s">
+            <label class="uk-form-label">Спальных мест:</label>
+            <select class="uk-select" name="bed_count">
+                <option value="">Все</option>
+                <option value="1" {% if bed_filter == '1' %}selected{% endif %}>1</option>
+                <option value="2" {% if bed_filter == '2' %}selected{% endif %}>2</option>
+                <option value="3" {% if bed_filter == '3' %}selected{% endif %}>3</option>
+                <option value="4" {% if bed_filter == '4' %}selected{% endif %}>4+</option>
+            </select>
+        </div>
+        <div class="uk-width-1-4@s">
+            <label class="uk-form-label">Категория:</label>
+            <select class="uk-select" name="category">
+                <option value="">Все</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"i" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="uk-width-1-4@s">
+            <label class="uk-form-label uk-invisible">.</label>
+            <button type="submit" class="uk-button uk-button-primary uk-width-1-1">Применить фильтры</button>
+        </div>
+        <div class="uk-width-1-4@s">
+            <label class="uk-form-label uk-invisible">.</label>
+            <a href="{% url 'manager_rooms' %}" class="uk-button uk-button-default uk-width-1-1">Сбросить фильтры</a>
+        </div>
+    </form>
+</div>
+
+<div class="uk-grid uk-child-width-1-3@m uk-child-width-1-1@s uk-margin-bottom" uk-grid>
+    {% for room in rooms %}
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+            <div class="uk-card-badge uk-label">{{ room.floor }} этаж</div>
+            <h3 class="uk-card-title">Комната №{{ room.id }}</h3>
+            <p><span class="uk-text-bold">Категория:</span> {{ room.category.name }}</p>
+            <p><span class="uk-text-bold">Цена за ночь:</span> {{ room.category.price }} руб.</p>
+            <p><span class="uk-text-bold">Спальных мест:</span> {{ room.bed_count }}</p>
+            <p><span class="uk-text-bold">Комнат:</span> {{ room.room_count }}</p>
+            <p><span class="uk-text-bold">Оборудование:</span></p>
+            <ul class="uk-list uk-list-disc">
+                {% for equipment in room.category.equipment.all %}
+                <li>{{ equipment.item.name }}</li>
+                {% empty %}
+                <li>Без оборудования</li>
+                {% endfor %}
+            </ul>
+            <div class="uk-card-footer">
+                <span class="uk-label uk-label-success">Свободен</span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="uk-width-1-1">
+        <div class="uk-alert-warning" uk-alert>
+            <p>Номера не найдены</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
