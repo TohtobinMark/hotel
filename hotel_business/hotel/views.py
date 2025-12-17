@@ -28,7 +28,6 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.email}!')
 
-                # Redirect based on user role
                 if user.role == UserRole.ADMIN:
                     return redirect('admin')
                 elif user.role == UserRole.MANAGER:
@@ -161,14 +160,26 @@ def manager_dashboard(request):
         'active_bookings': active_bookings
     })
 
+
 @login_required
 def manager_clients(request):
     if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
-        messages.error(request, 'Access denied.')
+        messages.error(request, 'Доступ запрещен.')
         return redirect('services_list')
-
+    sort_by = request.GET.get('sort', 'first_name')
     clients = User.objects.filter(role=UserRole.CLIENT)
-    return render(request, 'users/manager/manager_clients.html', {'clients': clients})
+
+    if sort_by == 'first_name':
+        clients = clients.order_by('first_name')
+    elif sort_by == '-first_name':
+        clients = clients.order_by('-first_name')
+    else:
+        clients = clients.order_by('first_name')
+
+    return render(request, 'users/manager/manager_clients.html', {
+        'clients': clients,
+        'sort_by': sort_by,
+    })
 
 @login_required
 def manager_services(request):
@@ -210,27 +221,29 @@ def manager_rooms(request):
         'categories': categories,
         'bed_filter': bed_filter,
         'category_filter': category_filter,
-        'bed_counts': bed_counts
     })
+
 
 @login_required
 def add_service(request):
     if request.user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
-        messages.error(request, 'Access denied.')
+        messages.error(request, 'Доступ запрещен.')
         return redirect('services_list')
-#ddd
+
     if request.method == 'POST':
         try:
-            guest_id = request.POST.get('guest_id')
+            client_id = request.POST.get('client_id')
             service_id = request.POST.get('service_id')
             service_date = request.POST.get('service_date')
             quantity = int(request.POST.get('quantity', 1))
 
-            # Получаем объекты
-            guest = get_object_or_404(User, id=client_id, role=UserRole.CLIENT)
+            if not client_id or not service_id or not service_date:
+                messages.error(request, 'Все поля обязательны для заполнения')
+                return redirect('add_service')
+
+            client = get_object_or_404(User, id=client_id, role=UserRole.CLIENT)
             service = get_object_or_404(Service, id=service_id)
 
-            # Находим активное бронирование гостя
             today = timezone.now().date()
             booking = Booking.objects.filter(
                 guest=client,
@@ -239,8 +252,8 @@ def add_service(request):
             ).first()
 
             if not booking:
-                messages.error(request, 'У гостя нет активного бронирования')
-                return redirect('assign_service')
+                messages.error(request, 'У клиента нет активного бронирования на текущую дату')
+                return redirect('add_service')
 
             existing_provision = ServiceProvision.objects.filter(
                 booking=booking,
@@ -251,7 +264,8 @@ def add_service(request):
             if existing_provision:
                 existing_provision.quantity += quantity
                 existing_provision.save()
-                messages.success(request, f'Количество услуги "{service.name}" обновлено для гостя {guest.full_name}')
+                messages.success(request,
+                                 f'Количество услуги "{service.name}" обновлено для клиента {client.first_name}')
             else:
                 service_provision = ServiceProvision.objects.create(
                     booking=booking,
@@ -259,14 +273,15 @@ def add_service(request):
                     quantity=quantity,
                     service_date=service_date
                 )
-                messages.success(request, f'Услуга "{service.name}" успешно назначена гостю {guest.full_name}')
-                return redirect('assign_service')
+                messages.success(request, f'Клиент {client.first_name} успешно записан на услугу "{service.name}"')
+
+            return redirect('add_service')
 
         except Exception as e:
-            messages.error(request, f'Ошибка: {str(e)}')
+            messages.error(request, f'Ошибка при записи на услугу: {str(e)}')
 
     clients = User.objects.filter(role=UserRole.CLIENT)
-    services = Service.objects.all()
+    services = Service.objects.filter(is_active=True)
 
     return render(request, 'users/manager/add_service.html', {
         'clients': clients,

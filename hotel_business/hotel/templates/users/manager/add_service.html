@@ -11,10 +11,15 @@
             <div class="uk-margin">
                 <label class="uk-form-label">Выберите клиента:</label>
                 <div class="uk-form-controls">
-                    <select class="uk-select" name="guest_id" required>
-                        <option value="">-- Выберите клиента --</option>
-                        {% for guest in guests %}
-                        <option value="{{ guest.id }}">{{ guest.full_name }} ({{ guest.phone_number }})</option>
+                    <select class="uk-select" name="client_id" required>
+                        <option value="">Выберите клиента</option>
+                        {% for client in clients %}
+                        <option value="{{ client.id }}">
+                        {{ client.get_full_name|default:client.email }}
+                        ({{ client.email }})
+                            Телефон: {{ client.phone_number|default:"не указан" }}
+                            Скидка: {{ client.discount }}%
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -24,7 +29,7 @@
                 <label class="uk-form-label">Выберите услугу:</label>
                 <div class="uk-form-controls">
                     <select class="uk-select" name="service_id" required>
-                        <option value="">-- Выберите услугу --</option>
+                        <option value="">Выберите услугу</option>
                         {% for service in services %}
                         <option value="{{ service.id }}">{{ service.name }} - {{ service.cost }} руб.</option>
                         {% endfor %}

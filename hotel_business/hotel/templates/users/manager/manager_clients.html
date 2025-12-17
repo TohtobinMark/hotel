@@ -1,13 +1,26 @@
 {% extends 'users/manager/manager.html' %}
 
 {% block manager_content %}
-<h1 class="uk-heading-divider">Список клиентов</h1>
+<h1 class="uk-heading-divider">Клиенты</h1>
+<div class="uk-margin-bottom">
+<a href="?sort={% if sort_by == 'first_name' %}-first_name{% else %}first_name{% endif %}"
+   class="uk-button uk-button-default uk-button-small">
+    Сортировать по ФИО
+    {% if sort_by == 'first_name' %}
+    <span uk-icon="icon: triangle-up"></span>
+    {% elif sort_by == '-first_name' %}
+    <span uk-icon="icon: triangle-down"></span>
+    {% else %}
+    <span uk-icon="icon: triangle-up"></span>
+    {% endif %}
+</a>
+    </div>
 <div class="uk-grid uk-child-width-1-3@m uk-child-width-1-1@s uk-margin-bottom" uk-grid>
     {% for client in clients %}
     <div>
         <div class="uk-card uk-card-default uk-card-body">
             <div class="uk-card-badge uk-label">{{ client.get_role_display }}</div>
-            <h3 class="uk-card-title">{{ client.first_name }} {{ client.last_name }}</h3>
+            <h3 class="uk-card-title">{{ client.first_name }}</h3>
             <p><span class="uk-text-bold">Email:</span> {{ client.email }}</p>
             <p><span class="uk-text-bold">Телефон:</span> {{ client.phone_number }}</p>
             <p><span class="uk-text-bold">Дата регистрации:</span> {{ client.date_joined|date:"d.m.Y" }}</p>
