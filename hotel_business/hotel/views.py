@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Service, User, UserRole, Booking, Guest, Category, Room, ServiceProvision
+from .models import Service, User, UserRole, Booking, Category, Room, ServiceProvision, Document
 
 
 def login_view(request):
@@ -50,13 +50,42 @@ def logout_view(request):
 
 
 def services_list(request):
-    services = Service.objects.all()
+    services = Service.objects.filter(is_active=True).all()
+    user_data = None
+    services_with_discount = []
+    for service in services:
+        discounted_price = service.cost
+        if request.user.is_authenticated and request.user.role == 'client':
+            discounted_price = request.user.calculate_price_with_discount(service.cost)
+
+            services_with_discount.append({
+                'service': service,
+                'original_price': service.cost,
+                'discounted_price': discounted_price,
+                'has_discount': request.user.discount > 0 if request.user.is_authenticated else False,
+            })
+    if request.user.is_authenticated:
+        # Для всех авторизованных пользователей
+        user_data = {
+            'discount': float(request.user.discount),
+            'has_discount': request.user.discount > 0,
+            'discount_more_than_10': request.user.discount > 10,
+            'is_guest': request.user.role == UserRole.GUEST
+        }
+    else:
+        # Для неавторизованных гостей
+        user_data = {
+            'discount': 0,
+            'has_discount': False,
+            'discount_more_than_10': False,
+            'is_guest': True
+        }
     return render(request, 'services/list.html', {
         'services': services,
-        'user': request.user
+        'user': request.user,
+        'user_data': user_data,
+        'services_with_discount': services_with_discount
     })
-
-
 
 @login_required
 def manager(request):
@@ -164,7 +193,6 @@ def manager_rooms(request):
 
     rooms = Room.objects.select_related('category').prefetch_related('category__equipment__item')
     categories = Category.objects.all()
-
     bed_filter = request.GET.get('bed_count', '')
     category_filter = request.GET.get('category', '')
 
@@ -181,7 +209,8 @@ def manager_rooms(request):
         'rooms': rooms,
         'categories': categories,
         'bed_filter': bed_filter,
-        'category_filter': category_filter
+        'category_filter': category_filter,
+        'bed_counts': bed_counts
     })
 
 @login_required
@@ -198,13 +227,13 @@ def add_service(request):
             quantity = int(request.POST.get('quantity', 1))
 
             # Получаем объекты
-            guest = get_object_or_404(Guest, id=guest_id)
+            guest = get_object_or_404(User, id=client_id, role=UserRole.CLIENT)
             service = get_object_or_404(Service, id=service_id)
 
             # Находим активное бронирование гостя
             today = timezone.now().date()
             booking = Booking.objects.filter(
-                guest=guest,
+                guest=client,
                 check_in_date__lte=today,
                 check_out_date__gte=today
             ).first()
@@ -236,10 +265,10 @@ def add_service(request):
         except Exception as e:
             messages.error(request, f'Ошибка: {str(e)}')
 
-    guests = Guest.objects.all()
+    clients = User.objects.filter(role=UserRole.CLIENT)
     services = Service.objects.all()
 
     return render(request, 'users/manager/add_service.html', {
-        'guests': guests,
+        'clients': clients,
         'services': services
     })
