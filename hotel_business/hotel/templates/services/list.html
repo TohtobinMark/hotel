@@ -8,7 +8,27 @@
 </head>
 <body>
     <div class="uk-container uk-container-expand uk-margin-top">
-
+        {% if messages %}
+        <div class="uk-margin-bottom">
+            {% for message in messages %}
+            <div class="uk-alert uk-alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" uk-alert>
+                <a class="uk-alert-close" uk-close></a>
+                <p>
+                    {% if message.tags == 'success' %}
+                    <span uk-icon="icon: check" class="uk-margin-small-right"></span>
+                    {% elif message.tags == 'error' %}
+                    <span uk-icon="icon: warning" class="uk-margin-small-right"></span>
+                    {% elif message.tags == 'warning' %}
+                    <span uk-icon="icon: warning" class="uk-margin-small-right"></span>
+                    {% else %}
+                    <span uk-icon="icon: info" class="uk-margin-small-right"></span>
+                    {% endif %}
+                    {{ message }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <div class="uk-grid " uk-grid>
         <div class="uk-width-expand">
             <h1 class="uk-heading-primary uk-text-center uk-margin-large-left">Сервис отеля</h1>
